@@ -38,6 +38,7 @@ export default function SwapForm () {
   const [state, setState] = useReducer(
     (state, newState) => ({...state, ...newState}),
     {
+      approveAmount: 0,
       userBuyRatio: 0,
       userSellRatio: 0,
       fromCurrency: BNB,
@@ -45,7 +46,7 @@ export default function SwapForm () {
     },
     undefined,
   )
-  const {userBuyRatio, userSellRatio, fromCurrency, toCurrency} = state
+  const {approveAmount, userBuyRatio, userSellRatio, fromCurrency, toCurrency} = state
   const {
     web3,
     loadProvider,
@@ -149,20 +150,28 @@ export default function SwapForm () {
     })
   }
   
-  const swapBirdToBNB = (birdAmount) => {
-    const amount = web3.utils.toWei(birdAmount.toString())
+  const approveTokens = (e) => {
+    e && e.preventDefault()
+    const amount = web3.utils.toWei(approveAmount.toString())
     birdToken.methods.approve(
       shopContract.options.address,
       amount
     )
     .send({from: currentAccount})
     .then(() => {
-      shopContract.methods.userSellToken(amount)
-        .send({from: currentAccount})
-        .then(() => {
-          alert('Sell token successfully')
-          reset(defaultValues)
-        })
+      alert('Approve successfully')
+      setState({approveAmount: 0})
+    })
+    .catch((error) => {console.log(error)})
+  }
+  
+  const swapBirdToBNB = (birdAmount) => {
+    const amount = web3.utils.toWei(birdAmount.toString())
+    shopContract.methods.userSellToken(amount)
+    .send({from: currentAccount})
+    .then(() => {
+      alert('Sell token successfully')
+      reset(defaultValues)
     })
     .catch((error) => {
       console.log(error)
@@ -186,12 +195,34 @@ export default function SwapForm () {
     }
   }
 
+  const approveInput = (
+    <Box sx={{width: '220px', marginBottom: '50px' }}>
+      <TextField
+        fullWidth
+        label='Approve tokens'
+        size='small'
+        name='approveAmount'
+        value={approveAmount}
+        onChange={(e) => setState({approveAmount: e.target.value})}
+        InputProps={getInputProps('BIRD', FORM_FIELD.swapFromAmount)}
+      />
+      <Button
+        fullWidth
+        sx={{marginTop: '10px' }} 
+        variant='contained'
+        onClick={approveTokens}
+      >
+        Approve tokens
+      </Button>
+    </Box>
+  )
+  
   const swapSelection = (
     <Box sx={{
       width: '220px',
       display: 'flex',
       justifyContent: 'space-between',
-      marginBottom: '50px',
+      marginBottom: '20px',
     }}>
       <TextField
         id="fromCurrency"
@@ -236,7 +267,8 @@ export default function SwapForm () {
         <Typography variant='h6' component='span'>
           {shorthandAddress(currentAccount)}
         </Typography>
-        {swapSelection}
+        {isInitiated && swapSelection}
+        {isInitiated && approveInput}
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <FormTextField
             autoComplete='off'
