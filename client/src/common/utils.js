@@ -1,0 +1,1 @@
+export const shorthandAddress = (address) => address ? `${address.slice(0, 5)}...${address.slice(-4)}` : ''
