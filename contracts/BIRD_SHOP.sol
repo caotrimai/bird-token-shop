@@ -538,8 +538,8 @@ struct AirdropDetail {
 contract BIRD_SHOP {
     IERC20 public _token;
     address public owner;
-    uint public USER_BUY_RATIO = 10000; // 1 BNB = 10,0000 BIRD
-    uint public USER_SELL_RATIO = 100/100; // (100%) => 10,0000 BIRD = 1 BNB
+    uint public userBuyRatio = 10000; // 1 BNB = 10,0000 BIRD
+    uint public userSellRatio = 100/100; // (100%) => 10,0000 BIRD = 1 BNB
     uint public airdropAmountUnit = 10000;
     uint public airdropAmountUnitMax = 20000;
     uint public airdropAmountRemaining = 100000;
@@ -577,15 +577,15 @@ contract BIRD_SHOP {
     }
     
     function userBuyBirdToken() payable external checkSenderMoney checkBirdBalance{
-        require(_token.balanceOf(address(this)) >= msg.value* USER_BUY_RATIO + airdropAmountUnit, "Sorry, we don't have enough BIRD to sell");
-        _token.transfer(msg.sender, msg.value* USER_BUY_RATIO);
+        require(_token.balanceOf(address(this)) >= msg.value* userBuyRatio + airdropAmountUnit, "Sorry, we don't have enough BIRD to sell");
+        _token.transfer(msg.sender, msg.value* userBuyRatio);
     }
     
     function userSellToken(uint amount) external checkContractBalance{
         require(_token.allowance(msg.sender, address(this)) >= amount, "Sorry, please approve first");
         require(amount > 0,"Sorry, your BIRD must be more than zero'");
-        require((amount / USER_BUY_RATIO) * USER_SELL_RATIO < address(this).balance, "Sorry, we don't have enough BNB to buy your BIRD");
-        payable(msg.sender).transfer((amount / USER_BUY_RATIO) * USER_SELL_RATIO); // chuyen BNB cho sender
+        require((amount / userBuyRatio) * userSellRatio < address(this).balance, "Sorry, we don't have enough BNB to buy your BIRD");
+        payable(msg.sender).transfer((amount / userBuyRatio) * userSellRatio); // chuyen BNB cho sender
         _token.transferFrom(msg.sender, address(this), amount);
     }
     
