@@ -1,13 +1,12 @@
+import {yupResolver} from '@hookform/resolvers/yup'
 import {Button, MenuItem, TextField} from '@mui/material'
 import Box from '@mui/material/Box'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
 import React, {useEffect, useReducer} from 'react'
-import {shorthandAddress} from '../../../../common/utils'
-import {useWeb3} from '../../../../providers'
 import {useForm} from 'react-hook-form'
-import {yupResolver} from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import {useWeb3} from '../../../../providers'
 import FormTextField from '../../../common/FormFields/FormTextField'
 
 const BNB = 'BNB'
@@ -43,13 +42,20 @@ export default function SwapForm () {
       userSellRatio: 0,
       fromCurrency: BNB,
       toCurrency: BIRD,
+      approvePermission: false,
     },
     undefined,
   )
-  const {approveAmount, userBuyRatio, userSellRatio, fromCurrency, toCurrency} = state
+  const {
+    approveAmount, 
+    userBuyRatio, 
+    userSellRatio, 
+    fromCurrency, 
+    toCurrency, 
+    approvePermission
+  } = state
   const {
     web3,
-    loadProvider,
     birdToken,
     shopContract,
     currentAccount,
@@ -117,23 +123,13 @@ export default function SwapForm () {
 
   const submitButton = (
     <Button
+      disabled={!approvePermission}
       type='submit'
       sx={{marginTop: '20px'}}
       variant='contained'
       fullWidth
     >
       Submit
-    </Button>
-  )
-
-  const connectButton = (
-    <Button
-      onClick={loadProvider}
-      sx={{marginTop: '20px'}}
-      variant='contained'
-      fullWidth
-    >
-      Connect Wallet
     </Button>
   )
   
@@ -160,7 +156,10 @@ export default function SwapForm () {
     .send({from: currentAccount})
     .then(() => {
       alert('Approve successfully')
-      setState({approveAmount: 0})
+      setState({
+        approvePermission: true,
+        approveAmount: 0
+      })
     })
     .catch((error) => {console.log(error)})
   }
@@ -199,7 +198,7 @@ export default function SwapForm () {
     <Box sx={{width: '220px', marginBottom: '50px' }}>
       <TextField
         fullWidth
-        label='Approve tokens'
+        label='Enable approve'
         size='small'
         name='approveAmount'
         value={approveAmount}
@@ -212,7 +211,7 @@ export default function SwapForm () {
         variant='contained'
         onClick={approveTokens}
       >
-        Approve tokens
+        Enable
       </Button>
     </Box>
   )
@@ -264,9 +263,6 @@ export default function SwapForm () {
         flexDirection: 'column',
         alignItems: 'center',
       }}>
-        <Typography variant='h6' component='span'>
-          {shorthandAddress(currentAccount)}
-        </Typography>
         {isInitiated && swapSelection}
         {isInitiated && approveInput}
         <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -284,7 +280,7 @@ export default function SwapForm () {
             InputProps={getInputProps(toCurrency, FORM_FIELD.swapToAmount)}
             sx={{marginTop: '20px'}}
           />
-          {isInitiated ? submitButton : connectButton}
+          {isInitiated && submitButton}
         </form>
       </Box>
     </Box>

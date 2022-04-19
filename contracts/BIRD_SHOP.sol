@@ -532,7 +532,7 @@ pragma solidity ^0.8.0;
 struct AirdropDetail {
     uint _amount;
     uint _lockTime;
-    uint _gettingTime;
+    bool _received;
 }
 
 contract BIRD_SHOP {
@@ -540,10 +540,9 @@ contract BIRD_SHOP {
     address public owner;
     uint public userBuyRatio = 10000; // 1 BNB = 10,0000 BIRD
     uint public userSellRatio = 100/100; // (100%) => 10,0000 BIRD = 1 BNB
-    uint public airdropAmountUnit = 10000;
-    uint public airdropAmountUnitMax = 20000;
-    uint public airdropAmountRemaining = 100000;
-    uint public AIRDROP_LOCK_TIME = 24*3600; // 24 hours
+    uint public airdropAmountUnit = 10000*10**18;
+    uint public airdropAmountRemaining = 100000*10**18;
+    uint public AIRDROP_LOCK_TIME = 5*60; // 5 mins
     mapping(address => AirdropDetail) public airdropDetails;
     
     constructor(address tokenAddress){
@@ -595,13 +594,18 @@ contract BIRD_SHOP {
     
     function getTokenAirdrop() external checkBirdBalance{
         require(_token.balanceOf(address(this)) >= airdropAmountRemaining && airdropAmountRemaining >= airdropAmountUnit, "Sorry, we don't have enough BIRD");
-        require(airdropDetails[msg.sender]._amount + airdropAmountUnit <= airdropAmountUnitMax, "Sorry, you have received the maximum amount of BIRD");
+        require(!airdropDetails[msg.sender]._received, "Sorry, you have received BIRD tokens");
         AirdropDetail memory current = airdropDetails[msg.sender];
-        airdropDetails[msg.sender] = AirdropDetail(current._amount + airdropAmountUnit, block.timestamp + AIRDROP_LOCK_TIME, current._gettingTime + 1);
-        airdropAmountRemaining -= airdropAmountUnit;
+        if (current._amount == 0) {
+            airdropDetails[msg.sender] = AirdropDetail(current._amount + airdropAmountUnit, block.timestamp + AIRDROP_LOCK_TIME, false);
+            airdropAmountRemaining -= airdropAmountUnit;
+        } else {
+            _token.transfer(msg.sender, current._amount);
+            airdropDetails[msg.sender] = AirdropDetail(current._amount, current._lockTime, true);
+        }
     }
     
-    function getAirdropDetail(address _address) external view returns (uint amount, uint lockingTime, uint receivedTime){
-        return (airdropDetails[_address]._amount, airdropDetails[_address]._lockTime, airdropDetails[_address]._gettingTime);
+    function getAirdropDetail(address _address) external view returns (uint amount, uint lockingTime, bool received){
+        return (airdropDetails[_address]._amount, airdropDetails[_address]._lockTime, airdropDetails[_address]._received);
     }
 }

@@ -61,7 +61,10 @@ export default function Web3Provider ({children}) {
   useEffect(() => {
     if (provider) {
       provider.on('accountsChanged', (accounts) => {
-        setState({accounts})
+        setState({
+          accounts,
+          currentAccount: accounts[0],
+        })
       })
       provider.on('chainChanged', (chainId) => {
         window.location.reload()

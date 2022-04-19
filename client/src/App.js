@@ -1,8 +1,7 @@
-import React from 'react'
 import {Container} from '@mui/material'
 import {makeStyles} from '@mui/styles'
-
-import MarketSwap from './features/bird-shop/Components/MarketSwap'
+import React from 'react'
+import BirdShop from './features/bird-shop/Components/BirdShop'
 import RootWrapper from './RootWrapper'
 
 const useStyles = makeStyles({
@@ -23,7 +22,7 @@ function App () {
     <div className={classes.App}>
       <RootWrapper>
         <Container className={classes.body}>
-          <MarketSwap/>
+          <BirdShop/>
         </Container>
       </RootWrapper>
     </div>

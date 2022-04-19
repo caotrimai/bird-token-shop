@@ -1,5 +1,5 @@
 class BirdToken {
-  ADDRESS = '0x6B0B497E3738574fFBe7333d1Cc074dAA7e3910B'
+  ADDRESS = '0xEA9A384eC0793dd1bAb8c752D4E82C90978F7351'
 
   ABI = [
     {
@@ -68,8 +68,11 @@ class BirdToken {
     },
     {
       'inputs': [
-        {'internalType': 'address', 'name': 'spender', 'type': 'address'},
-        {'internalType': 'uint256', 'name': 'amount', 'type': 'uint256'}],
+        {
+          'internalType': 'address',
+          'name': 'spender',
+          'type': 'address',
+        }, {'internalType': 'uint256', 'name': 'amount', 'type': 'uint256'}],
       'name': 'approve',
       'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
       'stateMutability': 'nonpayable',
@@ -96,7 +99,11 @@ class BirdToken {
     },
     {
       'inputs': [
-        {'internalType': 'address', 'name': 'spender', 'type': 'address'},
+        {
+          'internalType': 'address',
+          'name': 'spender',
+          'type': 'address',
+        },
         {
           'internalType': 'uint256',
           'name': 'subtractedValue',
@@ -109,7 +116,11 @@ class BirdToken {
     },
     {
       'inputs': [
-        {'internalType': 'address', 'name': 'spender', 'type': 'address'},
+        {
+          'internalType': 'address',
+          'name': 'spender',
+          'type': 'address',
+        },
         {'internalType': 'uint256', 'name': 'addedValue', 'type': 'uint256'}],
       'name': 'increaseAllowance',
       'outputs': [{'internalType': 'bool', 'name': '', 'type': 'bool'}],
